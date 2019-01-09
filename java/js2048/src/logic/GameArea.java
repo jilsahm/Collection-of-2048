@@ -34,7 +34,7 @@ public final class GameArea {
 			this.callback = callback;
 			this.from     = from;
 			this.to       = to;
-			this.step     = step;
+			this.step     = (0 < step) ? 1 : -1;
 		}
 		
 	}
