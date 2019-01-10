@@ -1,31 +1,26 @@
 package graphics;
 
+import javafx.geometry.Pos;
 import javafx.scene.Scene;
-import javafx.scene.canvas.Canvas;
-import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Label;
-import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
-import javafx.scene.paint.Color;
 import javafx.scene.text.TextAlignment;
 import logic.GameArea;
 
 public class GameView {
 
-	private static final double CANVAS_SIZE = 300d;
+	private static final double NUMBER_PANE_PIXELSIZE = 300d;
+	private static final int    GAMEAREA_SIZE         = 4;
 	
-	private GameArea      gameArea;
-	private GraphicNumber testNumber;
+	private GameArea    gameArea;
 	
-	private Canvas   numbersCanvas;
-	private Label    score;
-	private Scene    gameScene;
+	private Label       score;
+	private NumbersPane numbersPane;
+	private Scene       gameScene;
 	
 	public GameView() {
-		this.gameArea = new GameArea(4);
-		this.testNumber = new GraphicNumber(10000, 10, 10, 50);
+		this.gameArea = new GameArea(GAMEAREA_SIZE);
 		this.buildComponents();
-		this.paintNumbers();
 	}
 	
 	private void buildComponents() {
@@ -35,22 +30,17 @@ public class GameView {
 		gridPane.add(scoreLabel, 0, 0, 1, 1);
 		
 		this.score = new Label("0");
-		this.score.setTextAlignment(TextAlignment.RIGHT);
+		this.score.setAlignment(Pos.CENTER_RIGHT);
 		gridPane.add(this.score, 1,	0, 1, 1);
 		
-		this.numbersCanvas = new Canvas(CANVAS_SIZE, CANVAS_SIZE);
-		gridPane.add(this.numbersCanvas, 0, 1, 2, 1);
+		this.numbersPane = new NumbersPane(GAMEAREA_SIZE);
+		gridPane.add(numbersPane, 0, 5, 2, 1);
 		
 		this.gameScene = new Scene(gridPane);
+		 
+		
 	}
-	
-	private void paintNumbers() {
-		GraphicsContext painter = this.numbersCanvas.getGraphicsContext2D();
-		painter.setFill(Color.GRAY);
-		painter.fillRect(0, 0, CANVAS_SIZE, CANVAS_SIZE);
-		this.testNumber.paint(painter);
-	}
-	
+		
 	public Scene getScene() {
 		return this.gameScene;
 	}

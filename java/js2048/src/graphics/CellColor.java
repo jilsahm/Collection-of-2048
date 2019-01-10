@@ -1,24 +1,25 @@
 package graphics;
 
-import javafx.scene.paint.Color;
-
 public final class CellColor {
 
-	private Color background;
-	private Color foreground;
+	private String background;
+	private String foreground;
 	
-	public CellColor(final int value) {
-		//TODO
-		this.background = Color.BLACK;
-		this.background = Color.WHITE;
+	public CellColor(final String background, final String foreground) {
+		this.background = background;
+		this.foreground = foreground;
 	}
 
-	public Color getBackground() {
+	public String getBackground() {
 		return background;
 	}
 
-	public Color getForeground() {
+	public String getForeground() {
 		return foreground;
+	}
+	
+	public static CellColor cellColorFactory(final int value) {
+		//TODO
 	}
 	
 }

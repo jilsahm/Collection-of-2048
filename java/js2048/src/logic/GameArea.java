@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
+import java.util.stream.IntStream;
 
 /**
  * Game area which holds all the numbers.
@@ -47,12 +48,13 @@ public final class GameArea {
 		abstract public ArrayList<MutableInteger> at(final int index);
 	}
 	
-	
+	private final int                            size;
 	private ArrayList<ArrayList<MutableInteger>> numbers;
-	private Random rng;
-	private Map<Direction, UpdateDirection> possibleDirections;
+	private Random                               rng;
+	private Map<Direction, UpdateDirection>      possibleDirections;
 	
 	public GameArea(final int size) {
+		this.size    = size;
 		this.numbers = new ArrayList<>();
 		this.rng     = new Random(System.currentTimeMillis());				
 		this.initialize();
@@ -68,38 +70,51 @@ public final class GameArea {
 		this.possibleDirections = Collections.unmodifiableMap(directions);
 	}
 	
-	//TODO
 	public void initialize() {
-		//Arrays.parallelSetAll(this.numbers, element -> this.rng.nextInt(3));
-		this.numbers = new ArrayList<>();
+		IntStream.range(0, this.size).forEach(row -> {
+			ArrayList<MutableInteger> currentRow = new ArrayList<>();
+			IntStream.range(0, this.size).forEach(column -> {
+				currentRow.add(new MutableInteger());
+			});
+			this.numbers.add(currentRow);
+		});		
+		this.spawnNumber();
+		this.spawnNumber();
+	}
+	
+	private boolean spawnNumber() {
+		if (!this.isAnyTileEmpty()) {
+			return false;
+		}
 		
-		ArrayList<MutableInteger> testrow01 = new ArrayList<>();
-		testrow01.add(new MutableInteger(0));
-		testrow01.add(new MutableInteger(1));
-		testrow01.add(new MutableInteger(1));
-		testrow01.add(new MutableInteger(2));
-		this.numbers.add(testrow01);
-
-		ArrayList<MutableInteger> testrow02 = new ArrayList<>();
-		testrow02.add(new MutableInteger(0));
-		testrow02.add(new MutableInteger(0));
-		testrow02.add(new MutableInteger(0));
-		testrow02.add(new MutableInteger(2));
-		this.numbers.add(testrow02);
-
-		ArrayList<MutableInteger> testrow03 = new ArrayList<>();
-		testrow03.add(new MutableInteger(1));
-		testrow03.add(new MutableInteger(1));
-		testrow03.add(new MutableInteger(0));
-		testrow03.add(new MutableInteger(4));
-		this.numbers.add(testrow03);
-
-		ArrayList<MutableInteger> testrow04 = new ArrayList<>();
-		testrow04.add(new MutableInteger(4));
-		testrow04.add(new MutableInteger(0));
-		testrow04.add(new MutableInteger(0));
-		testrow04.add(new MutableInteger(0));
-		this.numbers.add(testrow04);
+		final int    HIGH_CHANCE = 2;
+		final int    LOW_CHANCE  = 4;
+		final double THRESHOLD   = 0.9d;
+		boolean      notDone     = true;
+		
+		while (notDone) {
+			int row                     = rng.nextInt(this.size);
+			int column                  = rng.nextInt(this.size);
+			MutableInteger targetNumber = this.numbers.get(row).get(column);
+			
+			if (0 >= targetNumber.getValue()) {
+				targetNumber.setValue((rng.nextDouble() < THRESHOLD) ? HIGH_CHANCE : LOW_CHANCE);
+				notDone = false;
+			}
+		}		
+		
+		return true;
+	}
+	
+	private boolean isAnyTileEmpty() {
+		for (ArrayList<MutableInteger> row : this.numbers) {
+			for (MutableInteger column : row) {
+				if (0 >= column.getValue()) {
+					return true;
+				}
+			}
+		}
+		return false;
 	}
 	
 	@Override
@@ -197,11 +212,9 @@ public final class GameArea {
 	}
 	
 	public static void main(String[] args) {
-		GameArea gameArea = new GameArea(8);
+		GameArea gameArea = new GameArea(4);
 		System.out.println(gameArea.toString());
-		gameArea.update(Direction.SOUTH);
-		System.out.println(gameArea.toString());
-		gameArea.update(Direction.SOUTH);
+		gameArea.update(Direction.WEST);
 		System.out.println(gameArea.toString());
 	}
 	
