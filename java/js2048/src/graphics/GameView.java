@@ -1,16 +1,18 @@
 package graphics;
 
+import controls.KeyBoard;
+import javafx.event.EventHandler;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.GridPane;
-import javafx.scene.text.TextAlignment;
+import logic.Direction;
 import logic.GameArea;
 
-public class GameView {
+public class GameView implements EventHandler<KeyEvent>{
 
-	private static final double NUMBER_PANE_PIXELSIZE = 300d;
-	private static final int    GAMEAREA_SIZE         = 4;
+	private static final int GAMEAREA_SIZE = 4;
 	
 	private GameArea    gameArea;
 	
@@ -33,16 +35,23 @@ public class GameView {
 		this.score.setAlignment(Pos.CENTER_RIGHT);
 		gridPane.add(this.score, 1,	0, 1, 1);
 		
-		this.numbersPane = new NumbersPane(GAMEAREA_SIZE);
+		this.numbersPane = new NumbersPane(this.gameArea);
 		gridPane.add(numbersPane, 0, 5, 2, 1);
 		
-		this.gameScene = new Scene(gridPane);
-		 
-		
+		this.gameScene = new Scene(gridPane); 
+		this.gameScene.addEventHandler(KeyEvent.KEY_RELEASED, this);
 	}
 		
 	public Scene getScene() {
 		return this.gameScene;
+	}
+
+	@Override
+	public void handle(KeyEvent event) {
+		Direction direction = KeyBoard.getDirection(event);
+		if (null != direction) {
+			this.gameArea.update(direction);
+		}
 	}
 	
 }

@@ -1,5 +1,6 @@
 package logic;
 
+import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -211,11 +212,18 @@ public final class GameArea {
 		targetList.get(otherIndex).setValue(0);
 	}
 	
-	public static void main(String[] args) {
-		GameArea gameArea = new GameArea(4);
-		System.out.println(gameArea.toString());
-		gameArea.update(Direction.WEST);
-		System.out.println(gameArea.toString());
+	public void registerListeners(ArrayList<PropertyChangeListener> listeners) throws PropertyChangeListenerMismatchException{
+		if (listeners.size() != this.size * this.size) {
+			throw new PropertyChangeListenerMismatchException(String.format(
+				"Number of Listeners (%d) does not match the number of number tiles (%d).",
+				listeners.size(),
+				this.size * this.size
+			));
+		}
+	}
+	
+	public int getSize() {
+		return this.size;
 	}
 	
 }

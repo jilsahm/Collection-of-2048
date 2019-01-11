@@ -1,5 +1,8 @@
 package logic;
 
+import java.beans.PropertyChangeListener;
+import java.beans.PropertyChangeSupport;
+
 /**
  * I needed a mutable int wrapper to pass numbers by reference.
  * @author Jil Sahm
@@ -7,14 +10,16 @@ package logic;
  */
 public class MutableInteger {
 
-	private int value;
+	private int                   value;
+	private PropertyChangeSupport changes; 
 	
 	public MutableInteger() {
 		this(0);
 	}
 	
 	public MutableInteger(final int value) {
-		this.value = value;
+		this.value   = value;
+		this.changes = new PropertyChangeSupport(this);
 	}
 
 	public int getValue() {
@@ -22,19 +27,36 @@ public class MutableInteger {
 	}
 
 	public void setValue(int value) {
+		this.notifyListeners(value);
 		this.value = value;
 	}
 	
 	public boolean addValue(Object value) {
 		if (value instanceof Integer) {
-			this.value += ((Integer)value).intValue();
+			int increment = ((Integer)value).intValue();
+			this.notifyListeners(increment);
+			this.value += increment;
 			return true;
 		} else if (value instanceof MutableInteger) {
-			this.value += ((MutableInteger)value).getValue();
+			int increment = ((MutableInteger)value).getValue();
+			this.notifyListeners(increment);
+			this.value += increment;
 			return true;
 		}
 		return false;
 	}
+	
+	private void notifyListeners(final int newValue) {
+		changes.firePropertyChange("value", this.value, value);
+	}
+	
+	public void addPropertyChangeListener(PropertyChangeListener listener) {
+		this.changes.addPropertyChangeListener(listener);
+	}
+	
+	public void removePropertyChangeListener(PropertyChangeListener listener) {
+		this.changes.removePropertyChangeListener(listener);
+	}	
 	
 	public boolean equals(final int number) {
 		return this.value == number;
