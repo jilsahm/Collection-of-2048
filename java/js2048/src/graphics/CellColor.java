@@ -4,9 +4,10 @@ public final class CellColor {
 
 	static enum BaseColors { RED, GREEN, BLUE }
 	
-	static final int BASECOLOR_VALUE = 0xE0;
+	static final int BASECOLOR_VALUE = 0xD0;
 	static final int BASECOLOR_RANGE = 0xFF - BASECOLOR_VALUE;
-	static final int MAX_VALUE       = 131072;
+	//static final int MAX_VALUE       = 131072;
+	static final int MAX_VALUE       = 64;
 	
 	private String background;
 	private String foreground;
@@ -37,8 +38,8 @@ public final class CellColor {
 		
 		switch (baseColor) {
 			case RED:   return colorModification;
-			case GREEN: return colorModification / 2;
-			case BLUE:  return colorModification / 2 * -1;
+			case GREEN: return colorModification / 2 * -1;
+			case BLUE:  return colorModification * -1;
 		}		
 		return 0;
 	}
@@ -53,4 +54,8 @@ public final class CellColor {
 		return output.toString();
 	}
 	
+
+	public static void main(String[] args) {
+		System.out.println(CellColor.calculateColorAlteration(CellColor.BaseColors.RED, 2048));
+	}
 }

@@ -11,7 +11,7 @@ import logic.PropertyChangeListenerMismatchException;
 
 public class NumbersPane extends Parent{
 
-	private static final double PIXELPADDING = 10d;
+	public static final double PIXELPADDING = 10d;
 	
 	private final int size;
 	private ArrayList<NumberTile> numbers;

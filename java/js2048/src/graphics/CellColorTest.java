@@ -38,5 +38,4 @@ class CellColorTest {
 		final int testB03 = 0x21;		
 		assertEquals("#193221", CellColor.rgbToHexString(testR03, testG03, testB03));
 	}
-
 }

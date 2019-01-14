@@ -34,12 +34,12 @@ public class MutableInteger {
 	public boolean addValue(Object value) {
 		if (value instanceof Integer) {
 			int increment = ((Integer)value).intValue();
-			this.notifyListeners(increment);
+			this.notifyListeners(increment + this.value);
 			this.value += increment;
 			return true;
 		} else if (value instanceof MutableInteger) {
 			int increment = ((MutableInteger)value).getValue();
-			this.notifyListeners(increment);
+			this.notifyListeners(increment + this.value);
 			this.value += increment;
 			return true;
 		}
@@ -47,7 +47,7 @@ public class MutableInteger {
 	}
 	
 	private void notifyListeners(final int newValue) {
-		changes.firePropertyChange("value", this.value, value);
+		changes.firePropertyChange("value", this.value, newValue);
 	}
 	
 	public void addPropertyChangeListener(PropertyChangeListener listener) {

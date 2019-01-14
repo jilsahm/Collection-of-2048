@@ -1,6 +1,7 @@
 package logic;
 
 import java.beans.PropertyChangeListener;
+import java.beans.PropertyChangeSupport;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -50,14 +51,18 @@ public final class GameArea {
 	}
 	
 	private final int                            size;
+	private long                                 score;
 	private ArrayList<ArrayList<MutableInteger>> numbers;
 	private Random                               rng;
 	private Map<Direction, UpdateDirection>      possibleDirections;
+	private PropertyChangeSupport                changes;
 	
 	public GameArea(final int size) {
 		this.size    = size;
 		this.numbers = new ArrayList<>();
-		this.rng     = new Random(System.currentTimeMillis());				
+		this.rng     = new Random(System.currentTimeMillis());
+		this.score   = 0;
+		this.changes = new PropertyChangeSupport(this);
 		this.initialize();
 		this.fillDirections();
 	}
@@ -71,16 +76,24 @@ public final class GameArea {
 		this.possibleDirections = Collections.unmodifiableMap(directions);
 	}
 	
-	public void initialize() {
+	private void initialize() {
 		IntStream.range(0, this.size).forEach(row -> {
 			ArrayList<MutableInteger> currentRow = new ArrayList<>();
 			IntStream.range(0, this.size).forEach(column -> {
 				currentRow.add(new MutableInteger());
 			});
 			this.numbers.add(currentRow);
-		});		
-		this.spawnNumber();
-		this.spawnNumber();
+		});
+	}
+	
+	public void startNewGame(final int numberOfStartingNumbers) {
+		for (int i = 0; i < numberOfStartingNumbers; i++) {
+			if (this.isAnyTileEmpty()) {
+				this.spawnNumber();
+			}
+		}
+		this.notifyListeners(0);
+		this.score = 0;
 	}
 	
 	private boolean spawnNumber() {
@@ -161,6 +174,9 @@ public final class GameArea {
 		for (int listIndex = 0; listIndex < this.numbers.size(); listIndex++) {
 			this.partialUpdate(updateDirection.callback.at(listIndex), updateDirection);
 		}
+		if (this.isAnyTileEmpty()) {
+			this.spawnNumber();
+		}
 	}
 	
 	private void partialUpdate(ArrayList<MutableInteger> targetList ,UpdateDirection updateDirection) {
@@ -207,9 +223,18 @@ public final class GameArea {
 	private void uniteNumbers(ArrayList<MutableInteger> targetList, final int targetIndex, final int otherIndex) {
 		if (targetIndex == otherIndex) {
 			return;
-		}
+		}	
+		final long possiblePoints = targetList.get(targetIndex).getValue() * 2;
+		if (0 != possiblePoints) {
+			this.increaseScore(possiblePoints);
+		}		
 		targetList.get(targetIndex).addValue(targetList.get(otherIndex));
-		targetList.get(otherIndex).setValue(0);
+		targetList.get(otherIndex).setValue(0);	
+	}
+	
+	private void increaseScore(final long value) {
+		this.notifyListeners(this.score + value);
+		this.score += value;
 	}
 	
 	public void registerListeners(ArrayList<PropertyChangeListener> listeners) throws PropertyChangeListenerMismatchException{
@@ -219,11 +244,42 @@ public final class GameArea {
 				listeners.size(),
 				this.size * this.size
 			));
-		}
+		} else {
+			int index = 0;
+			for (ArrayList<MutableInteger> row : this.numbers) {
+				for (MutableInteger column : row) {
+					column.addPropertyChangeListener(listeners.get(index++));
+				}
+			}
+		}		
 	}
 	
 	public int getSize() {
-		return this.size;
+		return this.size;		
 	}
+	
+	public void debugPrintGameArea() {
+		StringBuilder output = new StringBuilder();
+		this.numbers.forEach(row -> {
+			row.forEach(column -> {
+				output.append(column.getValue());
+				output.append(" ");
+			});
+			output.append("\n");
+		});
+		System.out.println(output.toString());
+	}
+	
+	private void notifyListeners(final long newValue) {
+		changes.firePropertyChange("score", this.score, newValue);
+	}
+	
+	public void addPropertyChangeListener(PropertyChangeListener listener) {
+		this.changes.addPropertyChangeListener(listener);
+	}
+	
+	public void removePropertyChangeListener(PropertyChangeListener listener) {
+		this.changes.removePropertyChangeListener(listener);
+	}	
 	
 }
