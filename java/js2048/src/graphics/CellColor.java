@@ -34,7 +34,8 @@ public final class CellColor {
 	}
 	
 	static int calculateColorAlteration(BaseColors baseColor, final int value) {
-		final int colorModification = value * BASECOLOR_RANGE / MAX_VALUE;
+		//final int colorModification = value * BASECOLOR_RANGE / MAX_VALUE;
+		final int colorModification = value % BASECOLOR_RANGE;
 		
 		switch (baseColor) {
 			case RED:   return colorModification;
@@ -52,10 +53,5 @@ public final class CellColor {
 		output.append((0x10 > b) ? "0" + Integer.toHexString(b) : Integer.toHexString(b));
 		
 		return output.toString();
-	}
-	
-
-	public static void main(String[] args) {
-		System.out.println(CellColor.calculateColorAlteration(CellColor.BaseColors.RED, 2048));
-	}
+	}	
 }

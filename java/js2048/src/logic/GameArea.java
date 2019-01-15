@@ -96,6 +96,10 @@ public final class GameArea {
 		this.score = 0;
 	}
 	
+	void setValueAt(final int value, final int rowIndex, final int columnIndex) {
+		this.numbers.get(rowIndex).get(columnIndex).setValue(value);
+	}
+	
 	private boolean spawnNumber() {
 		if (!this.isAnyTileEmpty()) {
 			return false;
@@ -256,6 +260,47 @@ public final class GameArea {
 	
 	public int getSize() {
 		return this.size;		
+	}
+	
+	public boolean isNotGameOver() {
+		final int numberOfRows = this.numbers.size();
+		
+		for (int rowIndex = 0; rowIndex < numberOfRows; rowIndex++) {
+			final int numberOfColumns = this.numbers.get(rowIndex).size();	
+			
+			for (int columnIndex = 0; columnIndex < numberOfColumns; columnIndex++) {
+				if (this.emptyTileAt(rowIndex, columnIndex) || this.hasNeighboursWithSameValue(rowIndex, columnIndex, numberOfRows, numberOfColumns)) {
+					return true;
+				}
+			}
+		}
+		return false;		
+	}
+	
+	private boolean emptyTileAt(final int rowIndex, final int columnIndex) {
+		return this.numbers.get(rowIndex).get(columnIndex).equals(0);
+	}
+	
+	private boolean hasNeighboursWithSameValue(final int ownRowIndex, final int ownColumnIndex, final int numberOfRows, final int numberOfColumns) {
+		final MutableInteger ownNumber = this.numbers.get(ownRowIndex).get(ownColumnIndex);
+				
+		//NORTH
+		if (0 < ownRowIndex && ownNumber.equals(this.numbers.get(ownRowIndex - 1).get(ownColumnIndex))) {
+			return true;
+		}
+		//EAST
+		if (numberOfColumns > ownColumnIndex + 1 && ownNumber.equals(this.numbers.get(ownRowIndex).get(ownColumnIndex + 1))) {
+			return true;
+		}
+		//SOUTH
+		if (numberOfRows > ownRowIndex + 1 && ownNumber.equals(this.numbers.get(ownRowIndex + 1).get(ownColumnIndex))) {
+			return true;
+		}		
+		//WEST
+		if (0 < ownColumnIndex && ownNumber.equals(this.numbers.get(ownRowIndex).get(ownColumnIndex - 1))) {
+			return true;
+		}
+		return false;
 	}
 	
 	public void debugPrintGameArea() {
