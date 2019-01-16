@@ -29,4 +29,8 @@ public class KeyBoard {
 	public static Direction getDirection(KeyEvent event) {
 		return keyMap.get(event.getCode().getName());
 	}
+	
+	public static boolean isDirectionKey(KeyEvent event) {
+		return keyMap.containsKey(event.getCode().getName());
+	}
 }

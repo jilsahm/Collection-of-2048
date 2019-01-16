@@ -72,4 +72,9 @@ public class MutableInteger {
 		}
 		return false;
 	}
+	
+	@Override
+	public String toString() {
+		return Integer.toString(this.value);
+	}
 }

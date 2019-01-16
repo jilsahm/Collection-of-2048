@@ -16,6 +16,8 @@ import java.util.stream.IntStream;
  */
 public final class GameArea {
 
+	public static final int WINNING_NUMBER = 2048;
+	
 	/**
 	 * Internal helper class for storing runtime metadata.
 	 */
@@ -46,7 +48,7 @@ public final class GameArea {
 	 * Functional interface to allow function storing in the UpdateDirection-Class.
 	 */
 	@FunctionalInterface
-	private interface Fetchable{
+	interface Fetchable{
 		abstract public ArrayList<MutableInteger> at(final int index);
 	}
 	
@@ -56,13 +58,15 @@ public final class GameArea {
 	private Random                               rng;
 	private Map<Direction, UpdateDirection>      possibleDirections;
 	private PropertyChangeSupport                changes;
+	private SaveGameManager                      saveGameManager;
 	
 	public GameArea(final int size) {
-		this.size    = size;
-		this.numbers = new ArrayList<>();
-		this.rng     = new Random(System.currentTimeMillis());
-		this.score   = 0;
-		this.changes = new PropertyChangeSupport(this);
+		this.size            = size;
+		this.numbers         = new ArrayList<>();
+		this.rng             = new Random(System.currentTimeMillis());
+		this.score           = 0;
+		this.changes         = new PropertyChangeSupport(this);
+		this.saveGameManager = SaveGameManager.getInstance();
 		this.initialize();
 		this.fillDirections();
 	}
@@ -84,9 +88,11 @@ public final class GameArea {
 			});
 			this.numbers.add(currentRow);
 		});
+		this.saveGameManager.saveGame(this);
 	}
 	
 	public void startNewGame(final int numberOfStartingNumbers) {
+		this.resetAllTiles();
 		for (int i = 0; i < numberOfStartingNumbers; i++) {
 			if (this.isAnyTileEmpty()) {
 				this.spawnNumber();
@@ -94,6 +100,11 @@ public final class GameArea {
 		}
 		this.notifyListeners(0);
 		this.score = 0;
+		this.saveGameManager.saveGame(this);
+	}
+	
+	private void resetAllTiles() {
+		this.numbers.forEach(row -> row.forEach(column -> column.setValue(0)));
 	}
 	
 	void setValueAt(final int value, final int rowIndex, final int columnIndex) {
@@ -181,6 +192,7 @@ public final class GameArea {
 		if (this.isAnyTileEmpty()) {
 			this.spawnNumber();
 		}
+		this.saveGameManager.saveGame(this);
 	}
 	
 	private void partialUpdate(ArrayList<MutableInteger> targetList ,UpdateDirection updateDirection) {
@@ -260,6 +272,21 @@ public final class GameArea {
 	
 	public int getSize() {
 		return this.size;		
+	}
+	
+	public long getScore() {
+		return this.score;
+	}
+	
+	public boolean isGameWon() {
+		for (ArrayList<MutableInteger> row : this.numbers) {
+			for (MutableInteger column : row) {
+				if (column.equals(WINNING_NUMBER)) {
+					return true;
+				}
+			}
+		}
+		return false;
 	}
 	
 	public boolean isNotGameOver() {

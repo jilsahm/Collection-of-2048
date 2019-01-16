@@ -26,6 +26,25 @@ class GameAreaTest {
 	}
 	
 	@Test
+	void testIsGameWon() {
+		GameArea gameArea = this.prepareNewGameArea(
+			new int[][] {
+				{   4,    0},
+				{2048, 4096}
+			}
+		);		
+		assertTrue(gameArea.isGameWon());
+		
+		gameArea = this.prepareNewGameArea(
+			new int[][] {
+				{ 4,  0},
+				{32, 64}
+			}
+		);
+		assertFalse(gameArea.isGameWon());
+	}
+	
+	@Test
 	void testIsNotGameOver() {
 		GameArea gameArea = this.prepareNewGameArea(
 			new int[][] {

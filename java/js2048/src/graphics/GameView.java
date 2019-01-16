@@ -3,18 +3,22 @@ package graphics;
 import java.beans.PropertyChangeListener;
 
 import controls.KeyBoard;
+import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.geometry.HPos;
 import javafx.geometry.Insets;
+import javafx.geometry.VPos;
 import javafx.scene.Scene;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.RowConstraints;
 import logic.Direction;
 import logic.GameArea;
 
-public class GameView implements EventHandler<KeyEvent>{
+public class GameView implements EventHandler<Event>{
 
 	private static final int    GAMEAREA_SIZE            = 4;
 	private static final int    GAMEAREA_STARTINGNUMBERS = 2;
@@ -23,12 +27,12 @@ public class GameView implements EventHandler<KeyEvent>{
 	
 	private GameArea    gameArea;
 	
+	private Button      newGameButton;
 	private GridPane    gridPaneLayout;
 	private Label       messageLabel;
 	private NumbersPane numbersPane;
 	private ScoreLabel  score;	
-	private Scene       gameScene;
-	
+	private Scene       gameScene;	
 	
 	public GameView() {
 		this.gameArea = new GameArea(GAMEAREA_SIZE);
@@ -50,11 +54,16 @@ public class GameView implements EventHandler<KeyEvent>{
 		this.gridPaneLayout.add(this.score, 1,	0, 1, 1);		
 		
 		this.numbersPane = new NumbersPane(this.gameArea);
-		this.gridPaneLayout.add(numbersPane, 0, 5, 2, 1);
+		this.gridPaneLayout.add(numbersPane, 0, 5, 2, 1);		
 		
 		this.messageLabel = new Label("");
-		GridPane.setHalignment(this.messageLabel, HPos.CENTER);
-		this.gridPaneLayout.add(messageLabel, 0, 6, 2, 1);
+		GridPane.setHalignment(this.messageLabel, HPos.CENTER);		
+		this.gridPaneLayout.add(messageLabel, 0, 6, 1, 1);
+		
+		this.newGameButton = new Button("New Game");
+		this.newGameButton.addEventHandler(MouseEvent.MOUSE_CLICKED, this);
+		GridPane.setHalignment(this.newGameButton, HPos.RIGHT);
+		this.gridPaneLayout.add(this.newGameButton, 1, 6, 1, 1);
 		
 		this.gameScene = new Scene(this.gridPaneLayout); 
 		this.gameScene.getStylesheets().add(getClass().getResource(CSS_PATH).toExternalForm());
@@ -66,14 +75,28 @@ public class GameView implements EventHandler<KeyEvent>{
 	}
 
 	@Override
-	public void handle(KeyEvent event) {
-		Direction direction = KeyBoard.getDirection(event);
-		if (null != direction) {
+	public void handle(Event event) {
+		if (event instanceof KeyEvent) {
+			this.handleKeyEvent((KeyEvent) event);
+		} else if (event instanceof MouseEvent) {
+			this.handleMouseEvent((MouseEvent) event);
+		}
+		event.consume();
+	}
+	
+	private void handleKeyEvent(KeyEvent event) {
+		if (KeyBoard.isDirectionKey(event)) {
+			Direction direction = KeyBoard.getDirection(event);
 			this.gameArea.update(direction);
-			this.gameArea.debugPrintGameArea();
 			if (!this.gameArea.isNotGameOver()) {
 				this.displayMessage("Game Over");
 			}
+		}
+	}
+	
+	private void handleMouseEvent(MouseEvent event) {
+		if (event.getSource() == this.newGameButton) {
+			this.gameArea.startNewGame(GAMEAREA_STARTINGNUMBERS);
 		}
 	}
 	
