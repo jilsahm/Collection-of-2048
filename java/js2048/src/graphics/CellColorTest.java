@@ -14,7 +14,7 @@ class CellColorTest {
 		final int testAlteration02 = CellColor.calculateColorAlteration(CellColor.BaseColors.RED, 2048);
 		assertTrue(0 <= testAlteration02 && CellColor.BASECOLOR_RANGE >= testAlteration02);
 		
-		final int testAlteration03 = CellColor.calculateColorAlteration(CellColor.BaseColors.RED, CellColor.MAX_VALUE);
+		final int testAlteration03 = CellColor.calculateColorAlteration(CellColor.BaseColors.RED, 131000);
 		assertTrue(0 <= testAlteration03 && CellColor.BASECOLOR_RANGE >= testAlteration03);
 	
 		final int testAlteration04 = CellColor.calculateColorAlteration(CellColor.BaseColors.RED, 0);

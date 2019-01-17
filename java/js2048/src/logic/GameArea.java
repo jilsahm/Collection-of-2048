@@ -88,7 +88,6 @@ public final class GameArea {
 			});
 			this.numbers.add(currentRow);
 		});
-		this.saveGameManager.saveGame(this);
 	}
 	
 	public void startNewGame(final int numberOfStartingNumbers) {
@@ -276,6 +275,10 @@ public final class GameArea {
 	
 	public long getScore() {
 		return this.score;
+	}
+	
+	public void setScore(final long score) {
+		this.score = score;
 	}
 	
 	public boolean isGameWon() {

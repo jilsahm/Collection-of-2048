@@ -4,10 +4,9 @@ public final class CellColor {
 
 	static enum BaseColors { RED, GREEN, BLUE }
 	
-	static final int BASECOLOR_VALUE = 0xD0;
+	static final int BASECOLOR_VALUE = 0xB0;
 	static final int BASECOLOR_RANGE = 0xFF - BASECOLOR_VALUE;
 	//static final int MAX_VALUE       = 131072;
-	static final int MAX_VALUE       = 64;
 	
 	private String background;
 	private String foreground;

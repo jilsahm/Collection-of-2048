@@ -17,6 +17,7 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.RowConstraints;
 import logic.Direction;
 import logic.GameArea;
+import logic.SaveGameManager;
 
 public class GameView implements EventHandler<Event>{
 
@@ -37,7 +38,9 @@ public class GameView implements EventHandler<Event>{
 	public GameView() {
 		this.gameArea = new GameArea(GAMEAREA_SIZE);
 		this.buildComponents();
-		this.gameArea.startNewGame(GAMEAREA_STARTINGNUMBERS);
+		if (!SaveGameManager.getInstance().loadGame(this.gameArea)) {
+			this.gameArea.startNewGame(GAMEAREA_STARTINGNUMBERS);
+		}		
 	}
 	
 	private void buildComponents() {
