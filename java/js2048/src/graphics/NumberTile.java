@@ -43,34 +43,42 @@ public class NumberTile extends Label implements PropertyChangeListener{
 
 	@Override
 	public void propertyChange(PropertyChangeEvent event) {
-		String newNumber = event.getNewValue().toString();
+		String newNumber    = event.getNewValue().toString();
+		int    parsedNumber = Integer.parseInt(newNumber);
+		
+		if (0 > this.getText().compareTo(newNumber) && !this.getText().equals("")) {
+			this.playAnimation(parsedNumber);
+		} else {
+			this.updateColor(parsedNumber);
+		}
 		this.setText(newNumber.equals("0") ? "" : newNumber);
-		this.updateColor(Integer.parseInt(newNumber));		
+	}
+	
+	private void playAnimation(final int value) {
+		final NumberTile me        = this;		
+		final Animation  animation = new Transition() {
+            {
+                setCycleDuration(Duration.millis(200));
+                setInterpolator(Interpolator.EASE_OUT);
+                setCycleCount(2);
+                setAutoReverse(true);
+            }
+            @Override
+            protected void interpolate(double frac) {
+                Color backgroundColor = new Color(1 - frac, 1 - frac, 1 - frac, 1);
+                Color textColor       = new Color(0 + frac, 0 + frac, 0 + frac, 1);
+                
+                me.setBackground(new Background(new BackgroundFill(backgroundColor, CornerRadii.EMPTY, Insets.EMPTY)));
+                me.setTextFill(textColor);
+            }            
+        };
+        animation.setOnFinished(event -> me.updateColor(value));
+        animation.play();
 	}
 	
 	private void updateColor(final int value) {		
 		CellColor newColor = CellColor.cellColorFactory(value);
 				
-		this.setStyle(String.format("-fx-background-color: %s", newColor.getBackground()));
-
-		/*
-		final NumberTile me = this;
-		
-		final Animation animation = new Transition() {
-
-            {
-                setCycleDuration(Duration.millis(300));
-                setInterpolator(Interpolator.EASE_OUT);
-                setCycleCount(2);
-                setAutoReverse(true);
-            }
-
-            @Override
-            protected void interpolate(double frac) {
-                Color vColor = new Color(1, 0, 0, 1 - frac);
-                me.setBackground(new Background(new BackgroundFill(vColor, CornerRadii.EMPTY, Insets.EMPTY)));
-            }
-        };
-        animation.play();*/
+		this.setStyle(String.format("-fx-background-color: %s", newColor.getBackground()));		
 	}
 }

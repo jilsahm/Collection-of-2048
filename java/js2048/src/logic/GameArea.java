@@ -278,6 +278,7 @@ public final class GameArea {
 	}
 	
 	public void setScore(final long score) {
+		this.changes.firePropertyChange("score", this.score, score);
 		this.score = score;
 	}
 	

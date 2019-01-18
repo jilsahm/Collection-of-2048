@@ -40,7 +40,9 @@ public class GameView implements EventHandler<Event>{
 		this.buildComponents();
 		if (!SaveGameManager.getInstance().loadGame(this.gameArea)) {
 			this.gameArea.startNewGame(GAMEAREA_STARTINGNUMBERS);
-		}		
+		} else {
+			this.checkGameState();
+		}
 	}
 	
 	private void buildComponents() {
@@ -91,15 +93,19 @@ public class GameView implements EventHandler<Event>{
 		if (KeyBoard.isDirectionKey(event)) {
 			Direction direction = KeyBoard.getDirection(event);
 			this.gameArea.update(direction);
-			if (!this.gameArea.isNotGameOver()) {
-				this.displayMessage("Game Over");
-			}
+			this.checkGameState();
 		}
 	}
 	
 	private void handleMouseEvent(MouseEvent event) {
 		if (event.getSource() == this.newGameButton) {
 			this.gameArea.startNewGame(GAMEAREA_STARTINGNUMBERS);
+		}
+	}
+	
+	private void checkGameState() {
+		if (!this.gameArea.isNotGameOver()) {
+			this.displayMessage("Game Over");
 		}
 	}
 	
